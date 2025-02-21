@@ -13,8 +13,12 @@ spec:
       values: |
         controller:
           service:
+            enabled: true
+            type: LoadBalancer
             annotations:
               service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+          publishService:
+            enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: ingress-nginx
