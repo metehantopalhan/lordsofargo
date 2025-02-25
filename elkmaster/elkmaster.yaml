@@ -1,0 +1,66 @@
+# master-nodes.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elasticsearch-master
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://helm.elastic.co
+    targetRevision: 7.17.3
+    chart: elasticsearch
+    helm:
+      values: |
+        clusterName: "elasticsearch"
+        nodeGroup: "master"
+        
+        # Node configuration
+        master: true
+        data: false
+        ingest: false
+        
+        persistence:
+          enabled: true
+        
+        clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
+        
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        
+        esConfig:
+          elasticsearch.yml: |
+            xpack.security.enabled: false
+            discovery.seed_hosts: ["elasticsearch-master-headless"]
+            cluster.initial_master_nodes: ["elasticsearch-master-0","elasticsearch-master-1","elasticsearch-master-2"]
+            
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+            
+        volumeClaimTemplate:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+              
+        antiAffinity: "hard"
+
+        replicas: 3
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

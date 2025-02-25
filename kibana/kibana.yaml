@@ -1,0 +1,60 @@
+# kibana.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kibana
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://helm.elastic.co
+    targetRevision: 7.17.3
+    chart: kibana
+    helm:
+      values: |
+        elasticsearchHosts: "http://elasticsearch-master:9200"
+        
+        replicas: 1
+        
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+            
+        kibanaConfig:
+          kibana.yml: |
+            server.name: kibana
+            server.host: "0.0.0.0"
+            elasticsearch.hosts: ["http://elasticsearch-master:9200"]
+            
+        service:
+          type: ClusterIP
+          port: 5601
+          
+        ingress:
+          enabled: true
+          className: "nginx"
+          annotations:
+            nginx.ingress.kubernetes.io/ssl-redirect: "true"
+            nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+          hosts:
+            - host: kibana.example.com
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - secretName: kibana-tls
+              hosts:
+                - kibana.example.com
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

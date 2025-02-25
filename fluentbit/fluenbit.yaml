@@ -1,0 +1,80 @@
+project: default
+source:
+  repoURL: https://fluent.github.io/helm-charts
+  targetRevision: 0.39.0
+  helm:
+    values: |
+      config:
+        service: |
+          [SERVICE]
+              Daemon Off
+              Flush 1
+              Log_Level info
+              Parsers_File parsers.conf
+              HTTP_Server On
+              HTTP_Listen 0.0.0.0
+              HTTP_Port 2020
+              Health_Check On
+
+        inputs: |
+          [INPUT]
+              Name tail
+              Path /var/log/containers/*.log
+              Parser docker
+              Tag kube.*
+              Mem_Buf_Limit 5MB
+              Skip_Long_Lines On
+
+        filters: |
+          [FILTER]
+              Name kubernetes
+              Match kube.*
+              Merge_Log On
+              Keep_Log Off
+              K8S-Logging.Parser On
+              K8S-Logging.Exclude Off
+
+        outputs: |
+          [OUTPUT]
+              Name            es
+              Match           *
+              Host           10.0.28.76
+              Port           9200
+              HTTP_User      elastic
+              HTTP_Passwd    RmNz0nl7sjC7GJRY
+              Logstash_Format On
+              Logstash_Prefix kubernetes
+              Time_Key       @timestamp
+              Include_Tag_Key On
+              Generate_ID    On
+              Replace_Dots   On
+              Suppress_Type_Name On
+              tls           Off
+              net.keepalive On
+              net.keepalive_idle_timeout 10
+              Buffer_Size    False
+              Trace_Error    On
+              Trace_Output   On
+              Retry_Limit    False
+              Workers        2
+
+      resources:
+        limits:
+          memory: 300Mi
+          cpu: 200m
+        requests:
+          cpu: 100m
+          memory: 200Mi
+
+      tolerations:
+        - operator: Exists
+  chart: fluent-bit
+destination:
+  server: https://kubernetes.default.svc
+  namespace: logging
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+  syncOptions:
+    - CreateNamespace=true

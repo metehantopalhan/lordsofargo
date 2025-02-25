@@ -1,0 +1,40 @@
+project: default
+source:
+  repoURL: https://prometheus-community.github.io/helm-charts
+  targetRevision: 25.8.1
+  helm:
+    values: |
+      server:
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          hosts:
+            - prometheus.9.163.80.51.sslip.io
+
+      alertmanager:
+        enabled: true
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          hosts:
+            - alertmanager.9.163.80.51.sslip.io
+
+      server:
+        persistentVolume:
+          enabled: true
+          size: 50Gi
+
+      alertmanager:
+        persistentVolume:
+          enabled: true
+          size: 10Gi
+  chart: prometheus
+destination:
+  server: https://kubernetes.default.svc
+  namespace: monitoring
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+  syncOptions:
+    - CreateNamespace=true

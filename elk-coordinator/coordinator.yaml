@@ -1,0 +1,52 @@
+project: default
+source:
+  repoURL: https://helm.elastic.co
+  targetRevision: 7.17.3
+  helm:
+    values: |
+      clusterName: "elasticsearch"
+      nodeGroup: "coordinator"
+
+      # Node configuration
+      master: false
+      data: false
+      ingest: true
+
+      persistence:
+        enabled: false  # Coordinator nodes typically don't need persistent storage
+
+      clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
+
+      readinessProbe:
+        failureThreshold: 3
+        initialDelaySeconds: 120
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+
+      esConfig:
+        elasticsearch.yml: |
+          xpack.security.enabled: false
+          discovery.seed_hosts: ["elasticsearch-master-headless"]
+          
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "1000m"
+          memory: "2Gi"
+          
+      antiAffinity: "soft"
+
+      replicas: 3  # Changed to 3 coordinator nodes
+  chart: elasticsearch
+destination:
+  server: https://kubernetes.default.svc
+  namespace: logging
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+  syncOptions:
+    - CreateNamespace=true

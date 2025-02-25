@@ -1,0 +1,61 @@
+project: default
+source:
+  repoURL: https://grafana.github.io/helm-charts
+  targetRevision: 7.0.19
+  helm:
+    values: |
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts:
+          - grafana.9.163.80.51.sslip.io
+
+      persistence:
+        enabled: true
+        size: 10Gi
+
+      datasources:
+        datasources.yaml:
+          apiVersion: 1
+          datasources:
+          - name: Prometheus
+            type: prometheus
+            url: http://prometheus-server.monitoring.svc.cluster.local
+            access: proxy
+            isDefault: true
+
+      dashboardProviders:
+        dashboardproviders.yaml:
+          apiVersion: 1
+          providers:
+          - name: 'default'
+            orgId: 1
+            folder: ''
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/default
+
+      dashboards:
+        default:
+          kubernetes-cluster:
+            gnetId: 315
+            revision: 3
+            datasource: Prometheus
+          node-exporter:
+            gnetId: 1860
+            revision: 27
+            datasource: Prometheus
+
+      adminPassword: "admin123"  # Grafana admin şifresi
+  chart: grafana
+destination:
+  server: https://kubernetes.default.svc
+  namespace: monitoring
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+  syncOptions:
+    - CreateNamespace=true
