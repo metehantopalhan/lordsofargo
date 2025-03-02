@@ -1,6 +1,6 @@
 # Lords of Argo - Kubernetes Altyapı Kodu
 
-Bu depo, ArgoCD aracılığıyla yönetilen, kapsamlı bir izleme, günlük kaydı ve yönetim yığını uygulayan Kubernetes altyapı yapılandırmalarını içerir.
+Bu depo, ArgoCD aracılığıyla yönetilen, kapsamlı bir izleme, günlük kaydı ve cluster uygulayan Kubernetes altyapı yapılandırmalarını içerir.
 
 ## Bileşenler
 
@@ -11,7 +11,7 @@ Bu depo, ArgoCD aracılığıyla yönetilen, kapsamlı bir izleme, günlük kayd
 
 ###  (ELK)
 - **Elasticsearch**:
-  - Master Düğümleri: Küme durumunu ve indeksleri yönetir
+  - Master Düğümleri: cluster durumunu ve indeksleri yönetir
   - Veri Düğümleri: Veriyi depolar ve işler
   - Koordinatör Düğümleri: İstemci isteklerini ve arama işlemlerini yönetir
 - **Kibana**: Elasticsearch için görselleştirme ve yönetim arayüzü
@@ -20,7 +20,7 @@ Bu depo, ArgoCD aracılığıyla yönetilen, kapsamlı bir izleme, günlük kayd
 ### İzleme 
 - **Prometheus**: Metrik toplama ve depolama
 - **Grafana**: Metrik görselleştirme ve gösterge paneli
-  - Kubernetes küme ve Node Exporter gösterge panelleri önceden yapılandırılmış
+  - Kubernetes cluster ve Node Exporter gösterge panelleri önceden yapılandırılmış
 
 ## Mimari
 
@@ -39,10 +39,10 @@ Bu depo, ArgoCD aracılığıyla yönetilen, kapsamlı bir izleme, günlük kayd
   - Rancher: rancher.9.163.80.51.sslip.io
 
 ## Ön Koşullar
-- Kubernetes kümesi
+- Kubernetes clustersi
 - ArgoCD kurulu ve yapılandırılmış
 - Helm 3.x
-- kubectl küme erişimi yapılandırılmış
+- kubectl cluster erişimi yapılandırılmış
 
 ## Dağıtım
 
@@ -57,7 +57,7 @@ Tüm uygulamalar ArgoCD aracılığıyla dağıtılır ve yönetilir. Her bileş
 ├── kibana/             # Elasticsearch arayüzü
 ├── nginx-ingress/      # Ingress controller
 ├── prometheus/         # Metrik toplama
-└── rancher/            # Küme yönetimi
+└── rancher/            # cluster yönetimi
 ```
 
 ## Yapılandırma
@@ -90,7 +90,7 @@ Tüm uygulamalar ArgoCD aracılığıyla dağıtılır ve yönetilir. Her bileş
 
 ## Notlar
 
-- Bu kurulum, veri ve koordinatör düğümleri için yumuşak anti-affinity, master düğümleri için sert anti-affinity kullanır
+- Bu kurulum, veri ve koordinatör düğümleri için soft anti-affinity, master düğümleri için hard anti-affinity kullanır
 - Tüm bileşenler ArgoCD aracılığıyla otomatik senkronizasyon ve kendi kendini onarma ile yapılandırılmıştır
 - Tüm bileşenler için namespace oluşturma otomatikleştirilmiştir
 
