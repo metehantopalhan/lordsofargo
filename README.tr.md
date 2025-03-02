@@ -9,7 +9,7 @@ Bu depo, ArgoCD aracılığıyla yönetilen, kapsamlı bir izleme, günlük kayd
 - **Cert-Manager**: SSL/TLS sertifika yönetimini gerçekleştirir
 - **Rancher**: Kubernetes yönetim platformu
 
-### Günlük Kaydı Yığını (ELK)
+###  (ELK)
 - **Elasticsearch**:
   - Master Düğümleri: Küme durumunu ve indeksleri yönetir
   - Veri Düğümleri: Veriyi depolar ve işler
@@ -17,14 +17,14 @@ Bu depo, ArgoCD aracılığıyla yönetilen, kapsamlı bir izleme, günlük kayd
 - **Kibana**: Elasticsearch için görselleştirme ve yönetim arayüzü
 - **Fluent Bit**: Günlük toplama ve iletme
 
-### İzleme Yığını
+### İzleme 
 - **Prometheus**: Metrik toplama ve depolama
 - **Grafana**: Metrik görselleştirme ve gösterge paneli
   - Kubernetes küme ve Node Exporter gösterge panelleri önceden yapılandırılmış
 
 ## Mimari
 
-### Elasticsearch Kümesi
+### Elasticsearch 
 - 3 Master düğümü (özel kontrol düzlemi)
 - Her biri 100GB depolama alanına sahip 3 Veri düğümü
 - Yük dengeleme için 3 Koordinatör düğümü
